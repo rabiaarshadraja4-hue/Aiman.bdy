@@ -4,22 +4,23 @@
 <meta charset="UTF-8">
 <title>Happy Birthday Aiman 🎂💖</title>
 <style>
-/* Body background with image1 + overlay */
+/* Gradient animated background */
 body {
     margin: 0;
     padding: 0;
-    background: url('img.jpg') no-repeat center center fixed;
-    background-size: cover;
     font-family: Arial, sans-serif;
     overflow-x: hidden;
+    background: linear-gradient(270deg, #ff9a9e, #fad0c4, #fbc2eb, #a18cd1);
+    background-size: 800% 800%;
+    animation: gradientBG 20s ease infinite;
 }
 
-/* Optional overlay image2 as subtle layer */
+/* Optional overlay background image */
 body::after {
     content: "";
-    background: url('img2.jpg') no-repeat center center fixed;
+    background: url('image2.jpg') no-repeat center center fixed;
     background-size: cover;
-    opacity: 0.4; /* transparency */
+    opacity: 0.2;
     top: 0;
     left: 0;
     bottom: 0;
@@ -28,14 +29,21 @@ body::after {
     z-index: 1;
 }
 
+/* Gradient animation */
+@keyframes gradientBG {
+    0% {background-position:0% 50%;}
+    50% {background-position:100% 50%;}
+    100% {background-position:0% 50%;}
+}
+
 /* Main wrapper */
 #wrap {
     text-align: center;
     position: relative;
-    z-index: 2; /* content above background */
+    z-index: 2;
 }
 
-/* Birthday message styling */
+/* Birthday message */
 #birthday-message {
     font-size: 22px;
     color: #ff3399;
@@ -46,7 +54,7 @@ body::after {
     position: relative;
 }
 
-/* Clock styling */
+/* Live age clock */
 #clock-box {
     margin-top: 15px;
     font-size: 18px;
@@ -55,29 +63,68 @@ body::after {
     position: relative;
 }
 
-/* Canvas heart animation */
+/* Canvas */
 canvas {
     display: block;
     margin: 0 auto;
     position: relative;
-    z-index: 3; /* above background but below floating pics */
+    z-index: 3;
 }
 
 /* Floating Aiman pics */
 .side-image {
     position: absolute;
-    width: 150px;
+    width: 130px;
     border-radius: 15px;
     box-shadow: 0 0 15px #ff99cc;
     animation: float 4s ease-in-out infinite alternate;
-    z-index: 4; /* above canvas */
+    z-index: 4;
 }
-#side1 { top: 150px; left: 20px; animation-delay: 0s; }
-#side2 { top: 300px; right: 20px; animation-delay: 1.5s; }
+#side1 { top: 100px; left: 20px; animation-delay: 0s; }
+#side2 { top: 150px; right: 20px; animation-delay: 1s; }
+#side3 { top: 250px; left: 50%; transform: translateX(-50%); animation-delay: 2s; }
+#side4 { top: 350px; left: 10%; animation-delay: 3s; }
+#side5 { top: 400px; right: 10%; animation-delay: 4s; }
 
 @keyframes float {
     0% { transform: translateY(0px); }
     100% { transform: translateY(-20px); }
+}
+
+/* Hearts container */
+#hearts {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 6;
+    overflow: hidden;
+}
+.heart {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: red;
+    transform: rotate(45deg);
+    animation: floatHeart linear infinite;
+}
+.heart::before,
+.heart::after {
+    content: "";
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: red;
+    border-radius: 50%;
+}
+.heart::before { top: -10px; left: 0; }
+.heart::after { left: 10px; top: 0; }
+
+@keyframes floatHeart {
+    0% { transform: translateY(0) rotate(45deg); opacity:1; }
+    100% { transform: translateY(-800px) rotate(45deg); opacity:0; }
 }
 </style>
 </head>
@@ -85,12 +132,13 @@ canvas {
 
 <div id="wrap">
 
-    <!-- Floating images (Aiman's pics) -->
-    <img src="aiman1.jpg" class="side-image" id="side1" alt="Aiman Pic 1">
-    <img src="aiman2.jpg" class="side-image" id="side2" alt="Aiman Pic 2">
-<img src="aiman3.jpg" class="side-image" id="side3" alt="Aiman Pic 3">
-    <img src="aiman4.jpg" class="side-image" id="side4" alt="Aiman Pic 4">
-    <img src="aiman5.jpg" class="side-image" id="side5" alt="Aiman Pic 5">
+    <!-- Floating Aiman images -->
+    <img src="aiman1.jpg" class="side-image" id="side1" alt="Aiman 1">
+    <img src="aiman2.jpg" class="side-image" id="side2" alt="Aiman 2">
+    <img src="aiman3.jpg" class="side-image" id="side3" alt="Aiman 3">
+    <img src="aiman4.jpg" class="side-image" id="side4" alt="Aiman 4">
+    <img src="aiman5.jpg" class="side-image" id="side5" alt="Aiman 5">
+
     <!-- Birthday message -->
     <div id="birthday-message">
         My Cute Friend 💞<br>
@@ -110,10 +158,13 @@ canvas {
     <canvas id="canvas" width="1100" height="680"></canvas>
 </div>
 
-<!-- Audio -->
-<audio id="myAudio" loop>
+<!-- Audio autoplay -->
+<audio id="myAudio" autoplay loop>
     <source src="aud.mp3" type="audio/mpeg">
 </audio>
+
+<!-- Hearts container -->
+<div id="hearts"></div>
 
 <!-- Scripts -->
 <script src="./file/jquery.min.js"></script>
@@ -127,34 +178,8 @@ canvas {
 <script src="./file/love.js" charset="utf-8"></script>
 
 <script>
-// Audio fade-in function
-function playAudioFadeIn() {
-    var audio = document.getElementById("myAudio");
-    audio.volume = 0;
-    audio.play();
-    var vol = 0;
-    var fadeIn = setInterval(function(){
-        if(vol < 1){
-            vol += 0.01;
-            audio.volume = vol;
-        } else {
-            clearInterval(fadeIn);
-        }
-    }, 50);
-}
-
-// Fade in birthday message after 3s
-setTimeout(function(){
-    document.getElementById('birthday-message').style.opacity = 1;
-}, 3000);
-
-// Start audio fade-in after click anywhere
-document.getElementById('wrap').addEventListener('click', function(){
-    playAudioFadeIn();
-});
-
-// Live age clock calculation
-var birthDate = new Date(2005, 1, 14); // Feb is month 1
+// Live age clock
+var birthDate = new Date(2005, 1, 14); // Feb = 1
 function updateClock(){
     var now = new Date();
     var diff = now - birthDate;
@@ -165,9 +190,27 @@ function updateClock(){
     document.getElementById('clock').textContent = days + " days " + hours + " hours " + minutes + " minutes " + seconds + " seconds";
 }
 setInterval(updateClock, 1000);
-updateClock(); // initial
+updateClock();
 
-// Heart tree animation (from original template)
+// Fade in birthday message
+setTimeout(function(){
+    document.getElementById('birthday-message').style.opacity = 1;
+}, 2000);
+
+// Floating heart particles
+function createHeart() {
+    var heart = document.createElement("div");
+    heart.className = "heart";
+    heart.style.left = Math.random() * window.innerWidth + "px";
+    heart.style.width = 10 + Math.random()*20 + "px";
+    heart.style.height = heart.style.width;
+    heart.style.animationDuration = 3 + Math.random()*3 + "s";
+    document.getElementById("hearts").appendChild(heart);
+    setTimeout(()=>{ heart.remove(); }, 6000);
+}
+setInterval(createHeart, 300);
+
+// Heart tree animation
 (function() {
     var canvas = $('#canvas');
     if (!canvas[0].getContext) return false;
